@@ -15,6 +15,9 @@ more full-featured XML parsing tool available for Python.  I
 have no plans to include support for the etree parser in the
 standard libary.
 
+One other dependency is httplib2 (for the OAuth module).  You
+can obtain this module from the Python Package Index.
+
 This package is intended for use with the LinkedIn API.  
 You must supply your own API key for this library to work.
 Once you have an API key from LinkedIn, the syntax for instantiating
