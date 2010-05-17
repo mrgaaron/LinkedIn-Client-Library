@@ -1,8 +1,0 @@
-KNOWN ISSUES:
-
-###############
-
-1.  When using the Network Updates API, searching for more than one type of status update (i.e. types=['STAT', 'PRFU']) will return a syntax error from the LinkedIn server
-
-2.  Field selectors and integer URL arguments don't seem to mix.  Doing something like (count=0, selectors=['first-name', 'last-name']) will return an error from the LinkedIn server stating that the count parameter couldn't be parsed as an integer
-
