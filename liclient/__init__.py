@@ -201,7 +201,7 @@ class LinkedInAPI(object):
         
         NOTE:
         If you pass an email address as the recipient, you MUST include "first_name" AND
-        "last_name" as keyword arguments.  Conversely, if you mass a member ID as the
+        "last_name" as keyword arguments.  Conversely, if you pass a member ID as the
         recipient, you MUST include "name" and "value" as keyword arguments.  Documentation
         for obtaining those values can be found on the LinkedIn website.
         """
