@@ -11,3 +11,14 @@ Doing something like (count=0, selectors=['first-name', 'last-name'])
 will return an error from the LinkedIn server stating that 
 the count parameter couldn't be parsed as an integer.
 
+###############
+
+RELATIVELY UNTESTED:
+
+1.  Search API support - I've been using the keyword searches
+in development with no problems, but most of the rest of the
+possible paramters are not tested.
+
+2.  Invitation API - kind of hard to send test invitations
+without a willing dummy participant, so this untested
+
