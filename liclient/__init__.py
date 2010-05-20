@@ -166,19 +166,56 @@ class LinkedInAPI(object):
         return content
     
     def search(self, access_token, data):
+        """
+        Use the LinkedIn Search API to find users.  The criteria for your search
+        should be passed as the 2nd positional argument as a dictionary of key-
+        value pairs corresponding to the paramters allowed by the API.  Formatting
+        of arguments will be done for you (i.e. lists of keywords will be joined
+        with "+")
+        """
         srch = LinkedInSearchAPI(data, access_token)
         client = oauth.Client(self.consumer, srch.user_token)
         rest, content = client.request(srch.generated_url, method='GET')
         return LinkedInXMLParser(content).results
     
     def send_message(self, access_token, recipients, subject, body):
-        assert type(recipients) == type(list()), '"Recipients argument" (2st position) must be of type "list"'
+        """
+        Send a message to a connection.  "Recipients" is a list of ID numbers,
+        "subject" is the message subject, and "body" is the body of the message.
+        The LinkedIn API does not allow HTML in messages.  All XML will be applied
+        for you.
+        """
+        assert type(recipients) == type(list()), '"Recipients argument" (2nd position) must be of type "list"'
         mxml = self.message_factory(recipients, subject, body)
         user_token, url = self.prepare_request(access_token, self.api_mailbox_url)
         client = oauth.Client(self.consumer, user_token)
         resp, content = client.request(url, method='POST', body=mxml, headers={'Content-Type': 'application/xml'})
         return content
     
+    def send_invitation(self, access_token, recipients, subject, body, **kwargs):
+        """
+        Send an invitation to a user.  "Recipients" is an ID number OR email address
+        (see below), "subject" is the message subject, and "body" is the body of the message.
+        The LinkedIn API does not allow HTML in messages.  All XML will be applied
+        for you.
+        
+        NOTE:
+        If you pass an email address as the recipient, you MUST include "first_name" AND
+        "last_name" as keyword arguments.  Conversely, if you mass a member ID as the
+        recipient, you MUST include "name" and "value" as keyword arguments.  Documentation
+        for obtaining those values can be found on the LinkedIn website.
+        """
+        if 'first_name' in kwargs.keys():
+            mxml = self.invitation_factory(recipients, subject, body,
+                                        first_name=kwargs['first_name'], last_name=kwargs['last_name'])
+        else:
+            mxml = self.invitation_factory(recipients, subject, body,
+                                        name=kwargs['name'], value=kwargs['value'])
+        user_token, url = self.prepare_request(access_token, self.api_mailbox_url)
+        client = oauth.Client(self.consumer, user_token)
+        resp, content = client.request(url, method='POST', body=mxml, headers={'Content-Type': 'application/xml'})
+        return content
+
     def prepare_request(self, access_token, url, kws=[]):
         user_token = oauth.Token(access_token['oauth_token'],
                         access_token['oauth_token_secret'])
@@ -281,6 +318,48 @@ class LinkedInAPI(object):
             BODY(body)
         )
         return re.sub('mailbox_item', 'mailbox-item', etree.tostring(mxml))
+
+    def invitation_factory(self, recipient, subject, body, **kwargs):
+        id_rec_path = '/people/id='
+        email_rec_path = '/people/email='
+        
+        E = ElementMaker()
+        MAILBOX_ITEM = E.mailbox_item
+        RECIPIENTS = E.recipients
+        RECIPIENT = E.recipient
+        PERSON = E.person
+        SUBJECT = E.subject
+        BODY = E.body
+        CONTENT = E.item_content
+        REQUEST = E.invitation_request
+        CONNECT = E.connect_type
+        FIRST = E.first_name
+        LAST = E.last_name
+        AUTH = E.authorization
+        NAME = E.name
+        VALUE = E.value
+        
+        if not '@' in recipient:
+            recs = RECIPIENT(PERSON(path=id_rec_path+r))
+            auth = CONTENT(REQUEST(CONNECT('friend'), AUTH(NAME(kwargs['name']), VALUE(kwargs['value']))))
+        else:
+            recs = RECIPIENT(
+                        PERSON(
+                            FIRST(kwargs['first_name']),
+                            LAST(kwargs['last_name']),
+                            path=email_rec_path+r
+                        )
+                    )
+            auth = CONTENT(REQUEST(CONNECT('friend')))        
+        mxml = MAILBOX_ITEM(
+            RECIPIENTS(
+                *recs
+            ),
+            SUBJECT(subject),
+            BODY(body),
+            auth
+        )
+        return re.sub('_', '-', etree.tostring(mxml))
             
 class LinkedInSearchAPI(LinkedInAPI):
     def __init__(self, params, access_token):
