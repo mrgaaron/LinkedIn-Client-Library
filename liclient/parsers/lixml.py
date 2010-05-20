@@ -147,6 +147,8 @@ class LinkedInNetworkUpdateParser(LinkedInXMLParser):
             obj = mappers.NetworkAnswerUpdate(data, u)
         elif u_type == 'JOBP':
             obj = mappers.NetworkJobPostingUpdate(data, u)
+        else:
+            obj = mappers.NetworkUpdate(data, u)
         return obj
     
 class LinkedInProfileParser(LinkedInXMLParser):
@@ -297,14 +299,12 @@ class LinkedInEducationParser(LinkedInXMLParser):
         try:
             data['id'] = self.xpath_collection['id'](tree)[0].text.strip() \
                         if len(self.xpath_collection['id'](tree)) else None
-        except Exception, e:
-            print e
+        except:
             data['id'] = None
         try:
             data['school_name'] = self.xpath_collection['school-name'](tree)[0].text.strip() \
                         if len(self.xpath_collection['id'](tree)) else None
-        except Exception, e:
-            print e
+        except:
             data['school_name'] = None
         try:
             data['field_of_study'] = self.xpath_collection['field-of-study'](tree)[0].text.strip() \
