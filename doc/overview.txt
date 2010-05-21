@@ -1,0 +1,72 @@
+This library is intended to be used with the LinkedIn API.  It is not
+an application in and of itself, so you will need to obtain your own
+API key to use the library properly.
+
+This overview will go over the library in the following sections:
+
+I.     Design Philosophy
+II.    Library Structure
+III.   Additional Information
+
+I.  Design Philosophy
+
+The library is highly object-oriented in nature.  Pretty much everything
+you can do will end up being passed through a series of objects.  The
+client interface is an object, all parsers are objects, and even XML nodes
+from API returns are objects.
+
+Most importantly, all returns from the LinkedIn API come back as objects,
+not XML string literals.  This includes API errors caused by bad URL
+formats, bad access tokens, etc.  As of right now, the original XML
+used to construct the objects will not be available directly for you
+to inspect, although it can easily be accessed by calling
+etree.tostring() from the lxml library on the return object's xml
+attribute.
+
+In keeping with that and the Python design philosophy, most interactions
+with the API are done with standard Python objects and data types.  To use
+the search API, you pass a dict with your search criteria as key-value pairs.
+To use field selectors, you simply pass a list of strings.  To specify timestamps,
+you can either pass the UTC string/integer or a standard Python datetime object.
+Lowlevel type conversions and URL formatting should be done for you.
+
+If it should work, it probably does.  If it doesn't, let me know or contribute
+code to make it work :).
+
+II.  Library Structure
+
+	liclient/
+		__init__.py - contains the LinkedInAPI class itself and is
+			      the entry point for the library
+		analysis/
+			__init__.py
+			nlp.py  - contains utilities for NLP analysis
+				  of profiles (requires NLTK)
+		oauth2/
+			__init__.py - 3rd party module for dealing with
+				      oauth, MIT license is included in
+				      the module itself
+		parsers/
+			__init__.py
+			lixml.py   - contains the parsers for XML returns
+			helpers.py - helper functions for data conversion
+			mappers.py - classes for mapping XML returns
+
+III.  Additional Information
+
+I work at a small recruiting firm and wrote the library to help us do
+LinkedIn integrations with our website and CRM system.  Some of the design
+choices probably do reflect that a little bit (like the update_content
+attribute that appears on each network update - it's not a part of the
+update itself but is a generated string based on the type of update).
+
+Any questions or comments can be emailed to me (my address is in the 
+readme).  Issues can be raised and fixes contributed at the code's 
+Github repo.
+
+Thanks for giving this library a look.
+
+Aaron
+
+
+			
