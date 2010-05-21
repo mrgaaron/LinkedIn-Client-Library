@@ -242,41 +242,11 @@ class LinkedInPositionParser(LinkedInXMLParser):
     
     def __build_data(self, tree):
         data = {}
-        try:
-            data['id'] = self.xpath_collection['id'](tree)[0].text.strip() \
-                if len(self.xpath_collection['id'](tree)) else None
-        except:
-            data['id'] = None
-        try:
-            data['title'] = self.xpath_collection['title'](tree)[0].text.strip() \
-                if len(self.xpath_collection['title'](tree)) else None
-        except:
-            data['title'] = None
-        try:
-            data['summary'] = self.xpath_collection['summary'](tree)[0].text.strip() \
-                if len(self.xpath_collection['summary'](tree)) else None
-        except:
-            data['summary'] = None
-        try:
-            data['start_date'] = self.xpath_collection['start-date'](tree)[0].text.strip() \
-                if len(self.xpath_collection['start-date'](tree)) else None
-        except:
-            data['start_date'] = None
-        try:
-            data['end_date'] = self.xpath_collection['end-date'](tree)[0].text.strip() \
-                if len(self.xpath_collection['end-date'](tree)) else None
-        except:
-            data['end_date'] = None
-        try:
-            data['is_current'] = self.xpath_collection['is-current'](tree)[0].text.strip() \
-                if len(self.xpath_collection['is-current'](tree)) else None
-        except:
-            data['is_current'] = None
-        try:
-            data['company'] = self.xpath_collection['company'](tree)[0].text.strip() \
-                if len(self.xpath_collection['company'](tree)) else None
-        except:
-            data['company'] = None
+        for n in tree.getchildren():
+            if not n.getchildren():
+                data[re.sub('-', '_', n.tag)] = n.text
+            else:
+                data[re.sub('-', '_', n.getchildren()[0].tag)] = n.getchildren()[0].text
         results = mappers.Position(data, tree)
         return results
 
@@ -296,40 +266,10 @@ class LinkedInEducationParser(LinkedInXMLParser):
     
     def __build_data(self, tree):
         data = {}
-        try:
-            data['id'] = self.xpath_collection['id'](tree)[0].text.strip() \
-                        if len(self.xpath_collection['id'](tree)) else None
-        except:
-            data['id'] = None
-        try:
-            data['school_name'] = self.xpath_collection['school-name'](tree)[0].text.strip() \
-                        if len(self.xpath_collection['id'](tree)) else None
-        except:
-            data['school_name'] = None
-        try:
-            data['field_of_study'] = self.xpath_collection['field-of-study'](tree)[0].text.strip() \
-                        if len(self.xpath_collection['id'](tree)) else None
-        except:
-            data['field_of_study'] = None
-        try:
-            data['start_date'] = self.xpath_collection['start-date'](tree)[0].text.strip() \
-                        if len(self.xpath_collection['id'](tree)) else None
-        except:
-            data['start_date'] = None
-        try:
-            data['end_date'] = self.xpath_collection['end-date'](tree)[0].text.strip() \
-                        if len(self.xpath_collection['id'](tree)) else None
-        except:
-            data['end_date'] = None
-        try:
-            data['degree'] = self.xpath_collection['degree'](tree)[0].text.strip() \
-                        if len(self.xpath_collection['id'](tree)) else None
-        except:
-            data['degree'] = None
-        try:
-            data['activities'] = self.xpath_collection['activities'](tree)[0].text.strip() \
-                        if len(self.xpath_collection['id'](tree)) else None
-        except:
-            data['activities'] = None
+        for n in tree.getchildren():
+            if not n.getchildren():
+                data[re.sub('-', '_', n.tag)] = n.text
+            else:
+                data[re.sub('-', '_', n.getchildren()[0].tag)] = n.getchildren()[0].text
         results = mappers.Education(data, tree)
         return results
