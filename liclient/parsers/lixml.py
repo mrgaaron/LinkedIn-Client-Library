@@ -246,7 +246,7 @@ class LinkedInPositionParser(LinkedInXMLParser):
             if not n.getchildren():
                 data[re.sub('-', '_', n.tag)] = n.text
             else:
-                data[re.sub('-', '_', n.getchildren()[0].tag)] = n.getchildren()[0].text
+                data[re.sub('-', '_', n.tag)] = n.getchildren()[0].text
         results = mappers.Position(data, tree)
         return results
 
@@ -270,6 +270,6 @@ class LinkedInEducationParser(LinkedInXMLParser):
             if not n.getchildren():
                 data[re.sub('-', '_', n.tag)] = n.text
             else:
-                data[re.sub('-', '_', n.getchildren()[0].tag)] = n.getchildren()[0].text
+                data[re.sub('-', '_', n.tag)] = n.getchildren()[0].text
         results = mappers.Education(data, tree)
         return results
