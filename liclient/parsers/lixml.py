@@ -13,7 +13,9 @@ class LinkedInXMLParser(object):
             'error': self.__parse_error,
             'position': self.__parse_position,
             'education': self.__parse_education,
-            'people': self.__parse_people_collection
+            'people': self.__parse_people_collection,
+            'twitter-account': self.__parse_twitter_accounts,
+            'member-url': self.__parse_member_url_resources
         }
         self.tree = etree.fromstring(content)
         self.root = self.tree.tag
@@ -49,6 +51,14 @@ class LinkedInXMLParser(object):
 
     def __parse_education(self, tree):
         content = LinkedInEducationParser(tree).results
+        return content
+        
+    def __parse_twitter_accounts(self, tree):
+        content = LinkedInTwitterAccountParser(tree).results
+        return content
+        
+    def __parse_member_url_resources(self, tree):
+        content = LinkedInMemberUrlResourceParser(tree).results
         return content
     
     def __parse_people_collection(self, tree):
@@ -273,3 +283,44 @@ class LinkedInEducationParser(LinkedInXMLParser):
                 data[re.sub('-', '_', n.tag)] = n.getchildren()[0].text
         results = mappers.Education(data, tree)
         return results
+        
+        
+class LinkedInTwitterAccountParser(LinkedInXMLParser):
+    def __init__(self, content):
+        self.tree = content
+        self.xpath_collection = {
+            'provider-account-id': etree.XPath('provider-account-id'),
+            'provider-account-name': etree.XPath('provider-account-name'),
+        }
+        self.results = self.__build_data(self.tree)
+    
+    def __build_data(self, tree):
+        data = {}
+        for n in tree.getchildren():
+            if not n.getchildren():
+                data[re.sub('-', '_', n.tag)] = n.text
+            else:
+                data[re.sub('-', '_', n.tag)] = n.getchildren()[0].text
+        results = mappers.TwitterAccount(data, tree)
+        return results
+        
+class LinkedInMemberUrlResourceParser(LinkedInXMLParser):
+    def __init__(self, content):
+        self.tree = content
+        self.xpath_collection = {
+            'url': etree.XPath('url'),
+            'name': etree.XPath('name'),
+        }
+        self.results = self.__build_data(self.tree)
+    
+    def __build_data(self, tree):
+        data = {}
+        for n in tree.getchildren():
+            if not n.getchildren():
+                data[re.sub('-', '_', n.tag)] = n.text
+            else:
+                data[re.sub('-', '_', n.tag)] = n.getchildren()[0].text
+        results = mappers.MemberUrlResource(data, tree)
+        return results
+        
+        
