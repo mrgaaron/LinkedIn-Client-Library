@@ -224,6 +224,7 @@ class Profile(LinkedInData):
         self.member_url_resources = []
         if not self.profile_url:
             self.set_profile_url()
+        self.get_location()
         self.get_positions()
         self.get_educations()
         self.get_twitter_accounts()
@@ -233,6 +234,15 @@ class Profile(LinkedInData):
         try:
             profile_url_xpath = etree.XPath('site-standard-profile-request/url')
             self.profile_url = profile_url_xpath(self.xml)[0].text.strip()
+        except:
+            pass
+            
+    def get_location(self):
+    	try:
+            location_name_xpath = etree.XPath('location/name')
+            self.location = location_name_xpath(self.xml)[0].text.strip()
+            country_code_xpath = etree.XPath('location/country/code')
+            self.country = country_code_xpath(self.xml)[0].text.strip()
         except:
             pass
         
