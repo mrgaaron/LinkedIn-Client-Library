@@ -243,20 +243,17 @@ class LinkedInPositionParser(LinkedInXMLParser):
             'id': etree.XPath('id'),
             'title': etree.XPath('title'),
             'summary': etree.XPath('summary'),
-            'start-date': etree.XPath('start-date'),
-            'end-date': etree.XPath('end-date'),
+            'start-date': etree.XPath('start-date/year'),
+            'end-date': etree.XPath('end-date/year'),
             'is-current': etree.XPath('is-current'),
             'company': etree.XPath('company/name')
         }
         self.results = self.__build_data(self.tree)
     
     def __build_data(self, tree):
-        data = {}
-        for n in tree.getchildren():
-            if not n.getchildren():
-                data[re.sub('-', '_', n.tag)] = n.text
-            else:
-                data[re.sub('-', '_', n.tag)] = n.getchildren()[0].text
+        data = dict(
+                [(re.sub('-','_',key),self.xpath_collection[key](tree)[0].text) for key in self.xpath_collection if len(self.xpath_collection[key](tree)) > 0]
+                )
         results = mappers.Position(data, tree)
         return results
 
