@@ -243,9 +243,12 @@ class LinkedInPositionParser(LinkedInXMLParser):
             'id': etree.XPath('id'),
             'title': etree.XPath('title'),
             'summary': etree.XPath('summary'),
-            'start-date': etree.XPath('start-date/year'),
-            'end-date': etree.XPath('end-date/year'),
+            'start-date-year': etree.XPath('start-date/year'),
+            'end-date-year': etree.XPath('end-date/year'),
+            'start-date-month': etree.XPath('start-date/month'),
+            'end-date-month': etree.XPath('end-date/month'),
             'is-current': etree.XPath('is-current'),
+            'company-id': etree.XPath('company/id'),
             'company': etree.XPath('company/name')
         }
         self.results = self.__build_data(self.tree)
