@@ -295,12 +295,9 @@ class LinkedInTwitterAccountParser(LinkedInXMLParser):
         self.results = self.__build_data(self.tree)
     
     def __build_data(self, tree):
-        data = {}
-        for n in tree.getchildren():
-            if not n.getchildren():
-                data[re.sub('-', '_', n.tag)] = n.text
-            else:
-                data[re.sub('-', '_', n.tag)] = n.getchildren()[0].text
+        data = dict(
+                [(re.sub('-','_',key),self.xpath_collection[key](tree)[0].text) for key in self.xpath_collection if len(self.xpath_collection[key](tree)) > 0]
+                )
         results = mappers.TwitterAccount(data, tree)
         return results
         
