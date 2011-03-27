@@ -1,39 +1,38 @@
-Standard stuff applies to install.  Run this from
-the command line:
+This is a fork of abrenzel's python wrapper for the linkedin api: https://github.com/mrgaaron/LinkedIn-Client-Library/
+
+His is very nice, but the search stuff is broken. Search should work here. It's a bit hacky.
+See the docs here:
+    http://developer.linkedin.com/docs/DOC-1191#
+
+Dependencies:
+    lxml
+    httplib2 (for OAuth)
+
+Installable via:
 
         python setup.py install
-        
-Documentation is in the doc directory.  Any questions
-can be forwarded to abrenzel@millerresource.com.  I'm
-usually pretty good about responding.
 
-The LinkedIn client library has lxml as a dependency for
-XML processing.  Yes, I know Python has a standard XML
-parser implementation.  Yes, I know lxml can be a bear to install
-if you're building from source.  Still, there's no faster or
-more full-featured XML parsing tool available for Python.  I 
-have no plans to include support for the etree parser in the
-standard libary.
+To get started:
 
-One other dependency is httplib2 (for the OAuth module).  You
-can obtain this module from the Python Package Index.
+1.  First, of course, we need to instantiate the API object with our consumer key and secret:
 
-This package is intended for use with the LinkedIn API.  
-You must supply your own API key for this library to work.
-Once you have an API key from LinkedIn, the syntax for instantiating
-an API client object is this:
+     consumer_key = 'mykey'
+     consumer_secret = 'mysecret'
+     APIClient = LinkedInAPI(consumer_key, consumer_secret)
 
-	mykey = 'mysecretkey'
-	mysecret = 'mysecretsecret'
-	myclient = LinkedInAPI(mykey, mysecret)
+2.  The first step for a new user is to retrieve a request token.  This is done like so:
 
-From there, you can obtain request tokens, authorization urls,
-access tokens, and actual LinkedIn data through the LinkedInAPI
-object's methods.  The object will handle signing requests, url
-formatting, and XML parsing for you.  Full documentation for these
-methods can be found in the doc directory (or will be there when 
-I get it done).
+     request_token = APIClient.get_request_token()
 
-Happy apping!
+3.  Then, we generate the URL to send the user to for authentication (I know the first line is a little ugly, I will probably simplify this soon):
 
-Aaron
+     authorization_url = APIClient.base_url + APIClient.authorize_path
+     url = "%s?oauth_token=%s" % (authorization_url, request_token['oauth_token'])
+
+4.  Once the user has authenticated, you will need to collect the oauth_verifier returned by the LinkedIn server in the URL.  This can be done
+     either by having the user type it in themselves or collecting the URL argument on the redirect from LinkedIn.  However you decided to get it,
+     this is how you use it:
+
+     access_token = APIClient.get_access_token(request_token, oauth_verifier)
+
+That's it!  You can use this access token for every request this particular user makes, for as long as they have authorized you to use it.
