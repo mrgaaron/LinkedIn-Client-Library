@@ -13,7 +13,7 @@ class LinkedInXMLParser(object):
             'error': self.__parse_error,
             'position': self.__parse_position,
             'education': self.__parse_education,
-            'people': self.__parse_people_collection
+            'people-search': self.__parse_people_collection
         }
         self.tree = etree.fromstring(content)
         self.root = self.tree.tag
@@ -52,7 +52,8 @@ class LinkedInXMLParser(object):
         return content
     
     def __parse_people_collection(self, tree):
-        ppl = tree.getchildren()
+        ppl, n = tree.getchildren()
+        result_count = int(n.text)
         content = []
         for p in ppl:
             rslts = LinkedInProfileParser(p).results
@@ -167,7 +168,35 @@ class LinkedInProfileParser(LinkedInXMLParser):
                     person[re.sub(r'-', '_', item.tag)] = item.text
             obj = mappers.Profile(person, p)
             results.append(obj)
+        
+        # deal with hierarchical results in a somewhat kludgy way
+        def fix(s):
+            return re.sub(r'-', '_', s)
+        def build_name(parent, item):
+            s = ''
+            p = item.getparent()
+            while p != parent:
+                s = fix(p.tag) + '_' + s
+                p = p.getparent()
+            s += fix(item.tag)
+            return s
         if not results:
+            person = {}
+            for item in tree.iterdescendants():
+                clean = item.text and item.text.strip()
+                if clean:
+                    name = build_name(tree, item)
+                    if name in person:
+                        value = person[name]
+                        if type(value) != list:
+                            person[name] = [value, clean]
+                        else:
+                            person[name].append(clean)
+                    else:
+                        person[name] = clean
+            obj = mappers.Profile(person, tree)
+            results.append(obj)
+        if False: #not results: # the original, elegant but wrong way
             person = {}
             for item in tree.getchildren():
                 person[re.sub(r'-', '_', item.tag)] = item.text
