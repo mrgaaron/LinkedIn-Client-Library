@@ -165,7 +165,7 @@ class LinkedInAPI(object):
         resp, content = client.request(url, method='PUT', body=xml_request)
         return content
     
-    def search(self, access_token, data):
+    def search(self, access_token, data, field_selector_string=None):
         """
         Use the LinkedIn Search API to find users.  The criteria for your search
         should be passed as the 2nd positional argument as a dictionary of key-
@@ -173,9 +173,10 @@ class LinkedInAPI(object):
         of arguments will be done for you (i.e. lists of keywords will be joined
         with "+")
         """
-        srch = LinkedInSearchAPI(data, access_token)
+        srch = LinkedInSearchAPI(data, access_token, field_selector_string)
         client = oauth.Client(self.consumer, srch.user_token)
         rest, content = client.request(srch.generated_url, method='GET')
+        # print content # useful for debugging...
         return LinkedInXMLParser(content).results
     
     def send_message(self, access_token, recipients, subject, body):
@@ -362,8 +363,10 @@ class LinkedInAPI(object):
         return re.sub('_', '-', etree.tostring(mxml))
             
 class LinkedInSearchAPI(LinkedInAPI):
-    def __init__(self, params, access_token):
-        self.api_search_url = 'http://api.linkedin.com/v1/people/'
+    def __init__(self, params, access_token, field_selector_string=None):
+        self.api_search_url = 'http://api.linkedin.com/v1/people-search'
+        if field_selector_string:
+            self.api_search_url += ':' + field_selector_string
         self.routing = {
             'keywords': self.keywords,
             'name': self.name,
@@ -374,6 +377,7 @@ class LinkedInSearchAPI(LinkedInAPI):
             'sort_criteria': self.sort_criteria
         }
         self.user_token, self.generated_url = self.do_process(access_token, params)
+        print "url:", self.generated_url
     
     def do_process(self, access_token, params):
         assert type(params) == type(dict()), 'The passed parameters to the Search API must be a dictionary.'
