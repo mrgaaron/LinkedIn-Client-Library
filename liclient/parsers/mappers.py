@@ -29,7 +29,7 @@ class LinkedInData(object):
         return etree.tostring(self.xml)
     
     def __str__(self):
-        return self.update_content if self.update_content else '<No content>'
+        return self.update_content if hasattr(self, 'update_content') and self.update_content else '<No Content>'
     
 class LinkedInError(LinkedInData):
     def __repr__(self):
