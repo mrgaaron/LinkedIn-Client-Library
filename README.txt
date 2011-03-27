@@ -1,8 +1,18 @@
 This is a fork of abrenzel's python wrapper for the linkedin api: https://github.com/mrgaaron/LinkedIn-Client-Library/
 
-His is very nice, but the search stuff is broken. Search should work here. It's a bit hacky.
+His is very nice, but the search stuff is broken. Search should work here, although it's a bit hacky.
+I've added support for field selector strings, too.
 See the docs here:
     http://developer.linkedin.com/docs/DOC-1191#
+    
+Here's an example of how to use the search:
+
+from liclient import LinkedInAPI
+api = LinkedInAPI(API_KEY, SECRET_KEY)
+params = {'first-name': 'John', 'last-name': 'Smith'}
+field_selector_string = '(people:(id,first-name,last-name,headline,public-profile-url),num-results)'
+results = api.search(ACCESS_TOKEN, params, field_selector_string)
+# do stuff with results
 
 Dependencies:
     lxml
