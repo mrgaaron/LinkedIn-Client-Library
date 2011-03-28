@@ -220,15 +220,29 @@ class Profile(LinkedInData):
         self.parse_data(data)
         self.positions = []
         self.educations = []
+        self.twitter_accounts = []
+        self.member_url_resources = []
         if not self.profile_url:
             self.set_profile_url()
+        self.get_location()
         self.get_positions()
         self.get_educations()
+        self.get_twitter_accounts()
+        self.get_member_url_resources()
         
     def set_profile_url(self):
         try:
             profile_url_xpath = etree.XPath('site-standard-profile-request/url')
             self.profile_url = profile_url_xpath(self.xml)[0].text.strip()
+        except:
+            pass
+            
+    def get_location(self):
+    	try:
+            location_name_xpath = etree.XPath('location/name')
+            self.location = location_name_xpath(self.xml)[0].text.strip()
+            country_code_xpath = etree.XPath('location/country/code')
+            self.country = country_code_xpath(self.xml)[0].text.strip()
         except:
             pass
         
@@ -245,9 +259,31 @@ class Profile(LinkedInData):
         for e in eds:
             obj = lixml.LinkedInXMLParser(etree.tostring(e)).results
             self.educations.append(obj)
+            
+    def get_twitter_accounts(self):
+    	twitter_accounts_xpath = etree.XPath('twitter-accounts/twitter-account')
+    	accounts = twitter_accounts_xpath(self.xml)
+    	for account in accounts:
+    		obj = lixml.LinkedInXMLParser(etree.tostring(account)).results
+    		self.twitter_accounts.append(obj)
+    		
+    def get_member_url_resources(self):
+    	url_resources_xpath = etree.XPath('member-url-resources/member-url')
+    	urls = url_resources_xpath(self.xml)
+    	for url in urls:
+    		obj = lixml.LinkedInXMLParser(etree.tostring(url)).results
+    		self.member_url_resources.append(obj)
+
+    		
         
 class Position(LinkedInData):
     pass
 
 class Education(LinkedInData):
+    pass
+    
+class TwitterAccount(LinkedInData):
+    pass
+    
+class MemberUrlResource(LinkedInData):
     pass

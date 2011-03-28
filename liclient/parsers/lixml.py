@@ -14,6 +14,9 @@ class LinkedInXMLParser(object):
             'position': self.__parse_position,
             'education': self.__parse_education,
             'people-search': self.__parse_people_collection
+            'people': self.__parse_people_collection,
+            'twitter-account': self.__parse_twitter_accounts,
+            'member-url': self.__parse_member_url_resources
         }
         self.tree = etree.fromstring(content)
         self.root = self.tree.tag
@@ -49,6 +52,14 @@ class LinkedInXMLParser(object):
 
     def __parse_education(self, tree):
         content = LinkedInEducationParser(tree).results
+        return content
+        
+    def __parse_twitter_accounts(self, tree):
+        content = LinkedInTwitterAccountParser(tree).results
+        return content
+        
+    def __parse_member_url_resources(self, tree):
+        content = LinkedInMemberUrlResourceParser(tree).results
         return content
     
     def __parse_people_collection(self, tree):
@@ -262,20 +273,20 @@ class LinkedInPositionParser(LinkedInXMLParser):
             'id': etree.XPath('id'),
             'title': etree.XPath('title'),
             'summary': etree.XPath('summary'),
-            'start-date': etree.XPath('start-date'),
-            'end-date': etree.XPath('end-date'),
+            'start-date-year': etree.XPath('start-date/year'),
+            'end-date-year': etree.XPath('end-date/year'),
+            'start-date-month': etree.XPath('start-date/month'),
+            'end-date-month': etree.XPath('end-date/month'),
             'is-current': etree.XPath('is-current'),
+            'company-id': etree.XPath('company/id'),
             'company': etree.XPath('company/name')
         }
         self.results = self.__build_data(self.tree)
     
     def __build_data(self, tree):
-        data = {}
-        for n in tree.getchildren():
-            if not n.getchildren():
-                data[re.sub('-', '_', n.tag)] = n.text
-            else:
-                data[re.sub('-', '_', n.tag)] = n.getchildren()[0].text
+        data = dict(
+                [(re.sub('-','_',key),self.xpath_collection[key](tree)[0].text) for key in self.xpath_collection if len(self.xpath_collection[key](tree)) > 0]
+                )
         results = mappers.Position(data, tree)
         return results
 
@@ -302,3 +313,41 @@ class LinkedInEducationParser(LinkedInXMLParser):
                 data[re.sub('-', '_', n.tag)] = n.getchildren()[0].text
         results = mappers.Education(data, tree)
         return results
+        
+        
+class LinkedInTwitterAccountParser(LinkedInXMLParser):
+    def __init__(self, content):
+        self.tree = content
+        self.xpath_collection = {
+            'provider-account-id': etree.XPath('provider-account-id'),
+            'provider-account-name': etree.XPath('provider-account-name'),
+        }
+        self.results = self.__build_data(self.tree)
+    
+    def __build_data(self, tree):
+        data = dict(
+                [(re.sub('-','_',key),self.xpath_collection[key](tree)[0].text) for key in self.xpath_collection if len(self.xpath_collection[key](tree)) > 0]
+                )
+        results = mappers.TwitterAccount(data, tree)
+        return results
+        
+class LinkedInMemberUrlResourceParser(LinkedInXMLParser):
+    def __init__(self, content):
+        self.tree = content
+        self.xpath_collection = {
+            'url': etree.XPath('url'),
+            'name': etree.XPath('name'),
+        }
+        self.results = self.__build_data(self.tree)
+    
+    def __build_data(self, tree):
+        data = {}
+        for n in tree.getchildren():
+            if not n.getchildren():
+                data[re.sub('-', '_', n.tag)] = n.text
+            else:
+                data[re.sub('-', '_', n.tag)] = n.getchildren()[0].text
+        results = mappers.MemberUrlResource(data, tree)
+        return results
+        
+        
