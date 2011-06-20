@@ -12,6 +12,7 @@ class LinkedInXMLParser(object):
             'connections': self.__parse_connections,
             'error': self.__parse_error,
             'position': self.__parse_position,
+            'skill': self.__parse_skills,
             'education': self.__parse_education,
             'people': self.__parse_people_collection,
             'twitter-account': self.__parse_twitter_accounts,
@@ -39,6 +40,10 @@ class LinkedInXMLParser(object):
     
     def __parse_connections(self, tree):
         content = LinkedInConnectionsParser(tree).results
+        return content
+        
+    def __parse_skills(self, tree):
+        content = LinkedInSkillsParser(tree).results
         return content
     
     def __parse_error(self, tree):
@@ -318,6 +323,25 @@ class LinkedInMemberUrlResourceParser(LinkedInXMLParser):
             else:
                 data[re.sub('-', '_', n.tag)] = n.getchildren()[0].text
         results = mappers.MemberUrlResource(data, tree)
+        return results
+        
+class LinkedInSkillsParser(LinkedInXMLParser):
+    def __init__(self, content):
+        self.tree = content
+        self.xpath_collection = {
+            'id': etree.XPath('id'),
+            'name': etree.XPath('skill/name'),
+        }
+        self.results = self.__build_data(self.tree)
+    
+    def __build_data(self, tree):
+        data = {}
+        for n in tree.getchildren():
+            if not n.getchildren():
+                data[re.sub('-', '_', n.tag)] = n.text
+            else:
+                data[re.sub('-', '_', n.tag)] = n.getchildren()[0].text
+        results = mappers.Skills(data, tree)
         return results
         
         
