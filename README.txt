@@ -1,7 +1,7 @@
-This is a fork of abrenzel's python wrapper for the linkedin api: https://github.com/mrgaaron/LinkedIn-Client-Library/
+This branch now includes a fair number of pull requests from PhilGo20 to help with the updates LinkedIn made to their search API, as well as some minor bug fixes.
 
-His is very nice, but the search stuff is broken. Search should work here, although it's a bit hacky.
-I've added support for field selector strings, too.
+Big thanks go out to Phil for helping out!
+
 See the docs here:
     http://developer.linkedin.com/docs/DOC-1191#
     
