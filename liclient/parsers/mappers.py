@@ -219,6 +219,7 @@ class Profile(LinkedInData):
         self.xml = xml
         self.parse_data(data)
         self.positions = []
+        self.skills = []
         self.educations = []
         self.twitter_accounts = []
         self.member_url_resources = []
@@ -226,6 +227,7 @@ class Profile(LinkedInData):
             self.set_profile_url()
         self.get_location()
         self.get_positions()
+        self.get_skills()
         self.get_educations()
         self.get_twitter_accounts()
         self.get_member_url_resources()
@@ -252,6 +254,14 @@ class Profile(LinkedInData):
         for p in pos:
             obj = lixml.LinkedInXMLParser(etree.tostring(p)).results
             self.positions.append(obj)
+            
+    def get_skills(self):
+        
+        profile_skills_xpath = etree.XPath('skills/skill')
+        skills = profile_skills_xpath(self.xml)
+        for s in skills:
+            obj = lixml.LinkedInXMLParser(etree.tostring(s)).results
+            self.skills.append(obj)
     
     def get_educations(self):
         profile_education_xpath = etree.XPath('educations/education')
@@ -283,6 +293,9 @@ class Education(LinkedInData):
     pass
     
 class TwitterAccount(LinkedInData):
+    pass
+  
+class Skills(LinkedInData):
     pass
     
 class MemberUrlResource(LinkedInData):

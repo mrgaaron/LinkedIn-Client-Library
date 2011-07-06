@@ -91,14 +91,11 @@ class LinkedInAPI(object):
         are automatically converted from integer to string for URL formatting
         if necessary.
         """
-        
-        user_token, url = self.prepare_request(access_token, self.api_profile_connections_url, kwargs)
+        if selectors:
+            url = self.prepare_field_selectors(selectors, self.api_profile_connections_url)
+        user_token, url = self.prepare_request(access_token, url, kwargs)
         client = oauth.Client(self.consumer, user_token)
-        if not selectors:
-            resp, content = client.request(url, 'GET')
-        else:
-            url = self.prepare_field_selectors(selectors, url)
-            resp, content = client.request(url, 'GET')
+        resp, content = client.request(url, 'GET')
         content = self.clean_dates(content)
         return LinkedInXMLParser(content).results
     
