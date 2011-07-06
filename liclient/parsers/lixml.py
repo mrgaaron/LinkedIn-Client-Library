@@ -353,10 +353,7 @@ class LinkedInMemberUrlResourceParser(LinkedInXMLParser):
                 data[re.sub('-', '_', n.tag)] = n.getchildren()[0].text
         results = mappers.MemberUrlResource(data, tree)
         return results
-        
-<<<<<<< HEAD
-        
-=======
+
 class LinkedInSkillsParser(LinkedInXMLParser):
     def __init__(self, content):
         self.tree = content
@@ -376,5 +373,3 @@ class LinkedInSkillsParser(LinkedInXMLParser):
         results = mappers.Skills(data, tree)
         return results
         
-        
->>>>>>> 775fd061e4f243ae37b4aa1e3b3e6e39c3dacff8
